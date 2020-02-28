@@ -36,7 +36,9 @@ public class CustomerAccountTest {
      */
     @Test
     public void testAccountWithoutMoneyHasZeroBalance() {
-        fail("not yet implemented");
+        Double money = customerAccount.getBalance();
+        assertNotNull(money);
+        assertEquals(Double.valueOf(0.0), money);
     }
     
     /**
@@ -44,18 +46,91 @@ public class CustomerAccountTest {
      */
     @Test
     public void testAddPositiveAmount() {
-        fail("not yet implemented");
+    	Double money = customerAccount.getBalance();
+        double newAmt = 5.0;
+        Double expectBal = money + newAmt;
+
+        customerAccount.add(newAmt);
+        Double newBal = customerAccount.getBalance();
+        assertNotNull(newBal);
+        assertEquals(expectBal, newBal);
     }
     
     /**
      * Tests that an illegal withdrawal throws the expected exception.
      * Use the logic contained in CustomerAccountRule; feel free to refactor the existing code.
      */
-    @Test
-    public void testWithdrawAndReportBalanceIllegalBalance() {
-        fail("not yet implemented");
+    @Test(expected = IllegalBalanceException.class)
+    public void testWithdrawAndReportBalanceIllegalBalance()  throws IllegalBalanceException {
+    	 rule = new CustomerAccountRule();
+         customerAccount.withdrawAndReportBalance(50.0, rule);
     }
     
     // Also implement missing unit tests for the above functionalities.
-
+    /**
+     * Tests to withdraw a negative amount
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithdrawNegativeAmount() {
+        rule = new CustomerAccountRule();
+        try {
+            customerAccount.withdrawAndReportBalance(-50.0, rule);
+        } catch (IllegalBalanceException e) {
+            fail("Exception while withdrawing");
+        }
+    }
+    /**
+     * Tests to withdraw a null Amount
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithdrawNullAmount() {
+        rule = new CustomerAccountRule();
+        try {
+            customerAccount.withdrawAndReportBalance(null, rule);
+        } catch (IllegalBalanceException e) {
+            fail("Exception while withdrawing");
+        }
+    }
+    /**
+     * Tests to withdraw an Amount with no rule passed
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithdrawWithNoRule() {
+        rule = new CustomerAccountRule();
+        try {
+            customerAccount.withdrawAndReportBalance(50.0, null);
+        } catch (IllegalBalanceException e) {
+            fail("Exception while withdrawing");
+        }
+    }
+    /**
+     * Tests to add Null value to the account
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddNullToAccount() {
+        customerAccount.add(null);
+    }
+    /**
+     * Tests to add Negative amount to the account
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddNegativeAmount() {
+        customerAccount.add(-10.0);
+    }
+    /**
+     * Tests General
+     */
+    @Test
+    public void testWithdrawGeneral() {
+        try {
+            rule = new CustomerAccountRule();
+            customerAccount.add(500.0);
+            Double expectedBal = customerAccount.getBalance() - 100.0;
+            Double newBal =  customerAccount.withdrawAndReportBalance(100.0, rule);
+            assertTrue(newBal >= 0.0);
+            assertEquals(expectedBal, newBal);
+        } catch (IllegalBalanceException e) {
+            fail("Exception while withdrawing");
+        }
+    }
 }
